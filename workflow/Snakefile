@@ -1,0 +1,24 @@
+# List your sample names (without file extension)
+samples = ["SRR15618897", "SRR15618896"]
+
+# Path to your raw FASTQ files
+input_path = "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
+
+# Final targets of the workflow
+rule all:
+    input:
+        expand("results/fastqc/{sample}_raw_fastqc.html", sample=samples)
+
+# FastQC on raw reads
+rule fastqc:
+    input:
+        f = "{path}/{sample}_raw.fastq"
+    output:
+        html = "results/fastqc/{sample}_raw_fastqc.html",
+        zip = "results/fastqc/{sample}_raw_fastqc.zip"
+    conda:
+        "envs/rnaseq_preprocess.yaml"
+    shell:
+        """
+        fastqc {input.f} --outdir results/fastqc
+        """
