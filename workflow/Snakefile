@@ -12,13 +12,31 @@ rule all:
 # FastQC on raw reads
 rule fastqc:
     input:
-        f = "{path}/{sample}_raw.fastq"
+        f = lambda wildcards: f"{input_path}/{wildcards.sample}_{wildcards.stage}.fastq"
     output:
-        html = "results/fastqc/{sample}_raw_fastqc.html",
-        zip = "results/fastqc/{sample}_raw_fastqc.zip"
+        html = "results/fastqc/{sample}_{stage}_fastqc.html",
+        zip = "results/fastqc/{sample}_{stage}_fastqc.zip"
     conda:
         "envs/rnaseq_preprocess.yaml"
     shell:
         """
         fastqc {input.f} --outdir results/fastqc
+        """
+
+
+rule fastp:
+    input:
+        f = lambda wildcards: f"{input_path}/{wildcards.sample}_raw.fastq"
+    output:
+        filtered = lambda wildcards: f"{input_path}/{wildcards.sample}_filtered.fastq",
+        html = "results/fastp/{sample}_fastp.html",
+        json = "results/fastp/{sample}_fastp.json"
+    conda:
+        "envs/rnaseq_preprocess.yaml"
+    shell:
+        """
+        fastp -i {input.f} \
+              -o {output.filtered} \
+              -h {output.html} \
+              -j {output.json}
         """
