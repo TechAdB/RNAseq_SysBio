@@ -1,0 +1,7 @@
+input_path: "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
+
+samples:
+  - SRR15618897
+  - SRR15618896
+
+reference: "/opt/home/migle/shared/mouse_reference/grcm38"

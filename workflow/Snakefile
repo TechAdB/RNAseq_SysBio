@@ -1,45 +1,15 @@
-# List your sample names (without file extension)
-samples = ["SRR15618897", "SRR15618896"]
+configfile: "config/config.yaml"
 
-# Path to your raw FASTQ files
-input_path = "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
+include: "rules/fastp.smk"
+include: "rules/fastqc.smk"
+include: "rules/alignment.smk"
 
-# Final targets of the workflow
+samples = config["samples"]
+
 rule all:
     input:
         expand("results/fastp/{sample}_fastp.html", sample=samples),
         expand("results/fastqc/{sample}_{stage}_fastqc.html",
-               sample=samples, stage=["raw", "filtered"])
-
-# FastQC on raw reads
-rule fastqc:
-    input:
-        f = lambda wildcards: f"{input_path}/{wildcards.sample}_{wildcards.stage}.fastq"
-    output:
-        html = "results/fastqc/{sample}_{stage}_fastqc.html",
-        zip = "results/fastqc/{sample}_{stage}_fastqc.zip"
-    conda:
-        "envs/rnaseq_preprocess.yaml"
-    shell:
-        """
-        fastqc {input.f} --outdir results/fastqc
-        """
-
-
-rule fastp:
-    input:
-        f = lambda wildcards: f"{input_path}/{wildcards.sample}_raw.fastq"
-    output:
-        filtered = f"{input_path}/{{sample}}_filtered.fastq",
-        html = "results/fastp/{sample}_fastp.html",
-        json = "results/fastp/{sample}_fastp.json"
-    conda:
-        "envs/rnaseq_preprocess.yaml"
-    shell:
-        """
-        fastp -i {input.f} \
-              -o {output.filtered} \
-              -h {output.html} \
-              -j {output.json}
-        """
-
+               sample=samples, stage=["raw", "filtered"]),
+        expand("results/alignment/{sample}.bam", sample=samples),
+        expand("results/alignment/{sample}.bam.bai", sample=samples)
