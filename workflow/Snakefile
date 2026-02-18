@@ -7,7 +7,9 @@ input_path = "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
 # Final targets of the workflow
 rule all:
     input:
-        expand("results/fastqc/{sample}_raw_fastqc.html", sample=samples)
+        expand("results/fastp/{sample}_fastp.html", sample=samples),
+        expand("results/fastqc/{sample}_{stage}_fastqc.html",
+               sample=samples, stage=["raw", "filtered"])
 
 # FastQC on raw reads
 rule fastqc:
@@ -28,7 +30,7 @@ rule fastp:
     input:
         f = lambda wildcards: f"{input_path}/{wildcards.sample}_raw.fastq"
     output:
-        filtered = lambda wildcards: f"{input_path}/{wildcards.sample}_filtered.fastq",
+        filtered = f"{input_path}/{{sample}}_filtered.fastq",
         html = "results/fastp/{sample}_fastp.html",
         json = "results/fastp/{sample}_fastp.json"
     conda:
@@ -40,3 +42,4 @@ rule fastp:
               -h {output.html} \
               -j {output.json}
         """
+
