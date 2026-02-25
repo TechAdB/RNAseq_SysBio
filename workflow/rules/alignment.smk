@@ -1,27 +1,39 @@
-rule hisat2_align:
+rule hisat2:
     input:
-        ref = config["reference"],
-        reads = lambda wc: f"{config['input_path']}/{wc.sample}_filtered.fastq"
+        fastq = expand("{path}/{{sample}}_filtered.fastq", path=input_path)
     output:
-        bam = "results/alignment/{sample}.bam"
-    conda:
-        "../envs/rnaseq_preprocess.yaml"
+        sam = "results/hisat2/{sample}.sam",
+        bam = "results/hisat2/{sample}.bam",
+        summary = "results/hisat2/{sample}_summary.txt"
+    params:
+        index = genome_index_dir
+    conda: "../envs/rnaseq_preprocess.yaml"
+    threads: 2
     shell:
         """
-        hisat2 -x {input.ref} \
-               -U {input.reads} \
-        | samtools view -bS - \
-        | samtools sort -o {output.bam}
+        hisat2 -p {threads} -x {params.index} -U {input.fastq} --new-summary \
+        --summary-file {output.summary} -S {output.bam}
+        """
+
+rule sort_bam:
+    input:
+        unsorted_bam = "results/hisat2/{sample}.bam"
+    output:
+        sorted_bam = "results/hisat2/{sample}.sorted.bam"
+    threads: 4
+    conda: "../envs/rnaseq_preprocess.yaml"
+    shell:
+        """
+        samtools sort -@ {threads} -o {output.sorted_bam} {input.unsorted_bam}
         """
 
 rule index_bam:
     input:
-        bam = "results/alignment/{sample}.bam"
+        sorted_bam = "results/hisat2/{sample}.sorted.bam"
     output:
-        bai = "results/alignment/{sample}.bam.bai"
-    conda:
-        "../envs/rnaseq_preprocess.yaml"
+        bam_index = "results/hisat2/{sample}.sorted.bam.bai"
+    conda: "../envs/rnaseq_preprocess.yaml"
     shell:
         """
-        samtools index {input.bam}
+        samtools index {input.sorted_bam}
         """

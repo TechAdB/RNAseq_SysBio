@@ -1,15 +1,22 @@
 configfile: "../config/config.yaml"
 
+input_path = config["input_path"]
+samples = config["samples"]
+genome_index_dir = config["genome_index_dir"]
+
 include: "rules/fastp.smk"
 include: "rules/fastqc.smk"
 include: "rules/alignment.smk"
-
-samples = config["samples"]
+include: "rules/count.smk" 
+include: "rules/multiqc.smk"
 
 rule all:
     input:
         expand("results/fastp/{sample}_fastp.html", sample=samples),
         expand("results/fastqc/{sample}_{stage}_fastqc.html",
                sample=samples, stage=["raw", "filtered"]),
-        expand("results/alignment/{sample}.bam", sample=samples),
-        expand("results/alignment/{sample}.bam.bai", sample=samples)
+        expand("results/hisat2/{sample}.sorted.bam", sample=samples),
+        expand("results/hisat2/{sample}.sorted.bam.bai", sample=samples),
+        expand("results/counts/{sample}.featureCounts.txt.summary", sample=samples),
+        "results/multiqc/multiqc_report.html"
+
