@@ -1,9 +1,9 @@
 input_path: "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
 
-samples:
-  - SRR15618897
-  - SRR15618896
+samples: ["SRR15618897", "SRR15618896"]
 
-reference: "/opt/shared/SYSBIO/Mus_musculus.GRCm39/genome"
-genome_index_dir: "/opt/shared/SYSBIO/Mus_musculus.GRCm39/genome"
+genome_index: "/opt/shared/SYSBIO/Mus_musculus.GRCm39/genome"
+
 gtf_file: "/opt/shared/SYSBIO/Mus_musculus.GRCm39/genome.gtf"
+
+multiqc_extra: "--verbose" 

@@ -1,22 +1,15 @@
+import os
+import pandas as pd
+
 configfile: "../config/config.yaml"
 
-input_path = config["input_path"]
-samples = config["samples"]
-genome_index_dir = config["genome_index_dir"]
-
-include: "rules/fastp.smk"
-include: "rules/fastqc.smk"
+include: "rules/qc.smk"
 include: "rules/alignment.smk"
-include: "rules/count.smk" 
-include: "rules/multiqc.smk"
+include: "rules/reportQC.smk"
+include: "rules/count.smk"
 
+# The 'all' rule defines the final targets of your pipeline
 rule all:
-    input:
-        expand("results/fastp/{sample}_fastp.html", sample=samples),
-        expand("results/fastqc/{sample}_{stage}_fastqc.html",
-               sample=samples, stage=["raw", "filtered"]),
-        expand("results/hisat2/{sample}.sorted.bam", sample=samples),
-        expand("results/hisat2/{sample}.sorted.bam.bai", sample=samples),
-        expand("results/counts/{sample}.featureCounts.txt.summary", sample=samples),
-        "results/multiqc/multiqc_report.html"
+   input:
+       "results/multiqc/multiqc_report.html"
 
