@@ -1,6 +1,8 @@
 input_path: "/opt/students/adomas.bajorinas/raw_data_exercise_20260218"
 
-samples: ["SRR15618897", "SRR15618896"]
+samples: ["SRR15618897", "SRR15618896","SRR15618895", "SRR15618894", "SRR15618893", "SRR15618892"]
+
+samplesheet: "/opt/students/adomas.bajorinas/RNAseq_SysBio/samplesheet.csv"
 
 genome_index: "/opt/shared/SYSBIO/Mus_musculus.GRCm39/genome"
 
